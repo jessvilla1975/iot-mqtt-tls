@@ -92,7 +92,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           MQTT_SERVER: ${{ secrets.MQTT_SERVER }}
-          MQTT_PORT: ${{ secrets.MQTT_PORT }}
+          MQTT_PORT: ${{ secrets.MQTT_PORT != '' && secrets.MQTT_PORT || '8883' }}
           MQTT_USER: ${{ secrets.MQTT_USER }}
           MQTT_PASSWORD: ${{ secrets.MQTT_PASSWORD }}
           MQTT_TLS: ${{ secrets.MQTT_TLS }}
