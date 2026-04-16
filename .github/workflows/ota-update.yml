@@ -55,6 +55,7 @@ jobs:
           WIFI_PASSWORD: ${{ secrets.WIFI_PASSWORD }}
 
       - name: Upload to S3
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           aws s3 cp .pio/build/esp32dev/firmware.bin s3://${{ secrets.S3_BUCKET_NAME }}/$FIRMWARE_NAME \
             --content-type application/octet-stream
@@ -64,6 +65,7 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Publish MQTT OTA message
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           pip install paho-mqtt
           python3 -c "import os, json, paho.mqtt.publish as publish; \
