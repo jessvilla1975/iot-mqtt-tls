@@ -29,6 +29,7 @@
 #include <libota.h>
 #include <libstorage.h>
 #include <libprovision.h>
+#include <Wire.h>
 
 // Versi?n del firmware
 #define FIRMWARE_VERSION "v1.1.1"
@@ -67,6 +68,7 @@ void setup() {
   }
   listWiFiNetworks();       // Paso 2. Lista las redes WiFi disponibles
   delay(1000);              // -- Espera 1 segundo para ver las redes disponibles
+  Wire.begin();             // Inicializa I2C una sola vez antes de OLED/SHT
   startDisplay();           // Paso 3. Inicializa la pantalla OLED
   setupSHT();               // Inicializa el sensor aunque no haya WiFi
   // Mostrar estado genérico mientras se intenta conectar para evitar SSID desactualizado en pantalla

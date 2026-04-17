@@ -194,7 +194,6 @@ void reconnect() {
  * Función setupIoT que configura el certificado raíz, el servidor MQTT y el puerto
  */
 void setupIoT() {
-  Wire.begin();                 //Inicializa el bus I2C: (SDA, SCL)
   espClient.setCACert(root_ca); //Configura el certificado raíz de la autoridad de certificación
   espClient.setTimeout(45); // Timeout TCP (s) antes del handshake TLS; redes lentas o con pérdidas
   bool useIpFallback = false;
@@ -252,7 +251,6 @@ void setupIoT() {
   Serial.println(client.getBufferSize());
   Serial.println("Callback MQTT configurado: receivedCallback");
   Serial.println("==========================");
-  setupSHT();                   //Configura el sensor SHT21
 }
 
 
