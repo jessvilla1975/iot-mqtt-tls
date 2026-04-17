@@ -68,23 +68,21 @@ void setup() {
   listWiFiNetworks();       // Paso 2. Lista las redes WiFi disponibles
   delay(1000);              // -- Espera 1 segundo para ver las redes disponibles
   startDisplay();           // Paso 3. Inicializa la pantalla OLED
-  // Si no hay credenciales, iniciar modo provisioning (AP)
-  if (!hasWiFiCredentials()) {
-    displayConnecting("Modo Configuracion AP");
-    startProvisioningAP();
-    return; // el loop manejará el portal
-  }
-  // Mostrar SSID que se intentará usar
-  String showSsid;
-  String tmpPwd;
-  if (loadWiFiCredentials(showSsid, tmpPwd)) {
-    displayConnecting(showSsid.c_str());
-  } else {
-    displayConnecting(ssid);
-  }
+  setupSHT();               // Inicializa el sensor aunque no haya WiFi
+  // Mostrar estado genérico mientras se intenta conectar para evitar SSID desactualizado en pantalla
+  displayConnecting("WiFi...");
   startWiFi("");            // Paso 5. Inicializa el servicio de WiFi
-  setupIoT();               // Paso 6. Inicializa el servicio de IoT
-  hora = setTime();         // Paso 7. Ajusta el tiempo del dispositivo con servidores SNTP
+  if (WiFi.status() == WL_CONNECTED) {
+    displayConnected(WiFi.SSID());
+    setupIoT();               // Paso 6. Inicializa el servicio de IoT
+    hora = setTime();         // Paso 7. Ajusta el tiempo del dispositivo con servidores SNTP
+  } else {
+    displayNoSignal();
+    Serial.println("Inicializacion IoT omitida: WiFi no conectado");
+    Serial.println("Entrando a modo configuracion AP...");
+    startProvisioningAP();
+    hora = 0;
+  }
   
   // Mostrar version al finalizar inicializacion (reutilizar variable ya declarada arriba)
   Serial.println();

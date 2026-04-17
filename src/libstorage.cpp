@@ -19,6 +19,10 @@ bool saveWiFiCredentials(const String &ssid, const String &password) {
 bool loadWiFiCredentials(String &outSsid, String &outPassword) {
   Preferences prefs;
   if (!prefs.begin(kNamespace, true)) return false;
+  if (!prefs.isKey(kWiFiSsidKey)) {
+    prefs.end();
+    return false;
+  }
   String s = prefs.getString(kWiFiSsidKey, "");
   String p = prefs.getString(kWiFiPwdKey,  "");
   prefs.end();
@@ -40,6 +44,10 @@ bool clearWiFiCredentials() {
 bool hasWiFiCredentials() {
   Preferences prefs;
   if (!prefs.begin(kNamespace, true)) return false;
+  if (!prefs.isKey(kWiFiSsidKey)) {
+    prefs.end();
+    return false;
+  }
   String s = prefs.getString(kWiFiSsidKey, "");
   prefs.end();
   return s.length() > 0;

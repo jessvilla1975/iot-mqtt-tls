@@ -39,6 +39,7 @@
 extern const char* MQTT_TOPIC_PUB; ///< El tópico de publicación debe tener estructura: <país>/<estado>/<ciudad>/<usuario>/out
 extern const char* MQTT_TOPIC_SUB; ///< El tópico de publicación debe tener estructura: <país>/<estado>/<ciudad>/<usuario>/out
 extern const char* mqtt_server;     ///< Cambia por la dirección de tu servidor MQTT
+extern const char* mqtt_server_ip;  ///< IP fija opcional para saltar DNS (ej. redes que secuestran dominios)
 extern const int mqtt_port;         ///< Puerto seguro (TLS)
 extern const char* mqtt_user;       ///< Cambia por tu usuario MQTT
 extern const char* mqtt_password;   ///< Cambia por tu contraseña MQTT

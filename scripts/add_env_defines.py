@@ -14,6 +14,7 @@ _MANAGED_DEFINES = frozenset(
         "STATE",
         "CITY",
         "MQTT_SERVER",
+        "MQTT_SERVER_IP",
         "MQTT_USER",
         "MQTT_PASSWORD",
         "WIFI_SSID",
@@ -100,6 +101,7 @@ country = env_str("COUNTRY", "colombia")
 state = env_str("STATE", "valle")
 city = env_str("CITY", "tulua")
 mqtt_server = env_str("MQTT_SERVER", "")
+mqtt_server_ip = env_str("MQTT_SERVER_IP", "")
 mqtt_user = env_str("MQTT_USER", "alvaro")
 mqtt_password = env_str("MQTT_PASSWORD", "supersecreto")
 wifi_ssid = env_str("WIFI_SSID", "MI_RED_WIFI")
@@ -115,6 +117,7 @@ append_cpp_string_macro("COUNTRY", country)
 append_cpp_string_macro("STATE", state)
 append_cpp_string_macro("CITY", city)
 append_cpp_string_macro("MQTT_SERVER", mqtt_server)
+append_cpp_string_macro("MQTT_SERVER_IP", mqtt_server_ip)
 append_cpp_string_macro("MQTT_USER", mqtt_user)
 append_cpp_string_macro("MQTT_PASSWORD", mqtt_password)
 append_cpp_string_macro("WIFI_SSID", wifi_ssid)

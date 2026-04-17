@@ -54,12 +54,24 @@ extern const char * client_id;  //ID del cliente MQTT
 time_t setTime() {
   //Sincroniza la hora del dispositivo con el servidor SNTP (Simple Network Time Protocol)
   Serial.print("Ajustando el tiempo usando SNTP");
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println(" omitido (sin WiFi)");
+    return 0;
+  }
   configTime(-5 * 3600, 0, "pool.ntp.org", "time.nist.gov"); //Configura la zona horaria y los servidores SNTP
   now = time(nullptr);              //Obtiene la hora actual
-  while (now < 1700000000) {        //Espera a que el tiempo sea mayor a 1700000000 (1 de enero de 2024)
+  int attempts = 0;
+  const int maxAttempts = 120;      // 60s máximo (120 * 500ms)
+  while (now < 1700000000 && attempts < maxAttempts) { //Evita bloqueo infinito si SNTP falla
     delay(500);                     //Espera 500ms antes de volver a intentar obtener la hora
     Serial.print(".");
     now = time(nullptr);            //Obtiene la hora actual
+    attempts++;
+  }
+  if (now < 1700000000) {
+    Serial.println(" timeout");
+    Serial.println("SNTP: no se pudo sincronizar hora (revisar Internet/DNS/NTP)");
+    return 0;
   }
   Serial.println(" hecho!");
   struct tm timeinfo;               //Estructura que almacena la información de la hora
@@ -79,6 +91,9 @@ static const unsigned long MQTT_DEBUG_INTERVAL = 30000; // 30 segundos
  * Si ocurre un error lo imprime en la consola.
  */
 void checkMQTT() {
+  if (WiFi.status() != WL_CONNECTED) {
+    return;
+  }
   if (!client.connected()) {
     reconnect();
   }
@@ -117,7 +132,7 @@ String getMacAddress() {
  * Función que se ejecuta cuando se establece conexión con el servidor MQTT
  */
 void reconnect() {
-  while (!client.connected()) { //Mientras no esté conectado al servidor MQTT
+  while (!client.connected() && WiFi.status() == WL_CONNECTED) { //Mientras haya WiFi y no esté conectado al servidor MQTT
     Serial.println("=== Intentando conectar a MQTT ===");
     Serial.print("Servidor: ");
     Serial.println(mqtt_server);
@@ -181,7 +196,44 @@ void reconnect() {
 void setupIoT() {
   Wire.begin();                 //Inicializa el bus I2C: (SDA, SCL)
   espClient.setCACert(root_ca); //Configura el certificado raíz de la autoridad de certificación
-  client.setServer(mqtt_server, mqtt_port);   //Configura el servidor MQTT y el puerto seguro
+  espClient.setTimeout(45); // Timeout TCP (s) antes del handshake TLS; redes lentas o con pérdidas
+  bool useIpFallback = false;
+  IPAddress fallbackIp;
+  if (mqtt_server != nullptr && strlen(mqtt_server) > 0) {
+    IPAddress brokerIp;
+    if (WiFi.hostByName(mqtt_server, brokerIp)) {
+      Serial.print("DNS MQTT: ");
+      Serial.print(mqtt_server);
+      Serial.print(" -> ");
+      Serial.println(brokerIp);
+      // Redes con DNS secuestrado devuelven 208.91.112.55 para dominios dinámicos.
+      if (brokerIp.toString() == "208.91.112.55") {
+        Serial.println("DNS MQTT: IP secuestrada detectada, se activará fallback por IP");
+        useIpFallback = true;
+      }
+    } else {
+      Serial.println("DNS MQTT: no se pudo resolver el host (revisar red o MQTT_SERVER)");
+      useIpFallback = true;
+    }
+  }
+
+  if (mqtt_server_ip != nullptr && strlen(mqtt_server_ip) > 0) {
+    if (fallbackIp.fromString(mqtt_server_ip)) {
+      if (useIpFallback) {
+        Serial.print("MQTT fallback IP activo: ");
+        Serial.println(fallbackIp);
+      }
+    } else {
+      Serial.print("MQTT_SERVER_IP inválido: ");
+      Serial.println(mqtt_server_ip);
+      useIpFallback = false;
+    }
+  }
+  if (useIpFallback && fallbackIp != IPAddress((uint32_t)0)) {
+    client.setServer(fallbackIp, mqtt_port); // Evita DNS secuestrado
+  } else {
+    client.setServer(mqtt_server, mqtt_port);
+  }
   
   // Configurar buffer más grande para mensajes grandes (por defecto es 256 bytes)
   client.setBufferSize(1024);
@@ -200,7 +252,6 @@ void setupIoT() {
   Serial.println(client.getBufferSize());
   Serial.println("Callback MQTT configurado: receivedCallback");
   Serial.println("==========================");
-  setTime();                    //Ajusta el tiempo del dispositivo con servidores SNTP
   setupSHT();                   //Configura el sensor SHT21
 }
 

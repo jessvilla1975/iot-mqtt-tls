@@ -41,6 +41,7 @@ void displayHeader(time_t now);         ///< Agrega a la pantalla el header con 
 void displayMeasures(float temp, float humi);  ///< Agrega los valores medidos de temperatura y humedad a la pantalla
 void displayMessage(String message);    ///< Agrega el mensaje indicado a la pantalla. Si el mensaje es OK, se busca mostrarlo centrado.
 void displayConnecting(String ssid);    ///< Muestra en la pantalla el mensaje de "Connecting to:" y luego el nombre de la red a la que se conecta.
+void displayConnected(String ssid);     ///< Muestra en la pantalla la red WiFi a la que ya quedó conectado el dispositivo.
 void displayLoop(String message, time_t now, float temp, float humi); ///< Muestra en la pantalla el mensaje recibido, las medidas de temperatura y humedad.
 
 #endif /* LIBDISPLAY_H */

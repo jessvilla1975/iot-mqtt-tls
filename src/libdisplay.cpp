@@ -105,6 +105,17 @@ void displayConnecting(String ssid) {
 }
 
 /**
+ * Muestra en la pantalla el estado de WiFi ya conectado y el SSID real.
+ */
+void displayConnected(String ssid) {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.println("WiFi conectado:\n");
+  display.println(ssid);
+  display.display();
+}
+
+/**
  * Muestra en la pantalla el mensaje recibido.
  * Se recibe el mensaje, la hora actual, la temperatura y la humedad.
  */
