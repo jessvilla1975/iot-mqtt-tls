@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <libwifi.h>
-#include <libdisplay.h>
 #include <libstorage.h>
 #include <Arduino.h>
 #include "esp_netif.h"

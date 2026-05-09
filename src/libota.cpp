@@ -23,8 +23,8 @@
  */
 
 #include <libota.h>
-#include <libiot.h>
 #include <libstorage.h>
+#include <WiFi.h>
 #include <HTTPClient.h>
 #include <cstring>
 #include <cstdlib>
